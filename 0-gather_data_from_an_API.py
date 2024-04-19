@@ -1,59 +1,38 @@
 #!/usr/bin/python3
+"""Create a python script's that returns information on a given employee's TODO list
+progress"""
 
-"""Python script to retrieve information about an employee's TODO list progress using a REST API"""
-
+import json
 import requests
 import sys
 
-def get_employee_todo_progress(employee_id):
-    """
-    Retrieve employee information and TODO list progress based on the employee ID.
-
-    Args:
-        employee_id (int): The ID of the employee.
-
-    Returns:
-        None
-
-    Prints:
-        Displays the employee's TODO list progress.
-    """
-
-    base_url = 'https://jsonplaceholder.typicode.com'
-    employee_url = f"{base_url}/users/{employee_id}"
-    todos_url = f"{base_url}/todos?userId={employee_id}"
-
-    
-    employee_response = requests.get(employee_url)
-
-    if employee_response.status_code != 200:
-        print("Error: Unable to retrieve employee data.")
-        return
-
-    employee_data = employee_response.json()
-    employee_name = employee_data.get('name')
-
-    
-    todos_response = requests.get(todos_url)
-
-    if todos_response.status_code != 200:
-        print("Error: Unable to retrieve TODO list data.")
-        return
-
-    todos_data = todos_response.json()
-    total_tasks = len(todos_data)
-    completed_tasks = sum(1 for task in todos_data if task['completed'])
-
-    print(f"Employee {employee_name} is done with tasks ({completed_tasks}/{total_tasks}):")
-
-    for task in todos_data:
-        if task['completed']:
-            print(f"\t{task['title']}")
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python script.py <employee_id>")
-        sys.exit(1)
 
-    employee_id = int(sys.argv[1])
-    get_employee_todo_progress(employee_id)
+    TASK_TITLE = []
+    NUMBER_OF_DONE_TASKS = 0
+    TOTAL_NUMBER_OF_TASKS = 0
+
+    Emp_id = int(sys.argv[1])
+
+    url_requestUser = f"https://jsonplaceholder.typicode.com/users/{Emp_id}"
+    responseUser = requests.get(url_requestUser)
+    fieldsUser = json.loads(responseUser.content)
+
+    EMPLOYEE_NAME = fieldsUser.get('name')
+
+    responseTodo = requests.get("https://jsonplaceholder.typicode.com/todos")
+    fieldsTodo = json.loads(responseTodo.content)
+
+    for task in fieldsTodo:
+        if task.get('userId') == Emp_id:
+            if task.get('completed') is True:
+                TASK_TITLE.append(task['title'])
+                NUMBER_OF_DONE_TASKS += 1
+            TOTAL_NUMBER_OF_TASKS += 1
+
+    print(f"Employee {EMPLOYEE_NAME} is done with "
+          f"tasks({NUMBER_OF_DONE_TASKS}/{TOTAL_NUMBER_OF_TASKS}):")
+
+    for task in TASK_TITLE:
+        print(f"\t {task}")
