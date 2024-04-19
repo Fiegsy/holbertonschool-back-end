@@ -1,14 +1,14 @@
 #!/usr/bin/python3
-"""Script that returns information on a given employee's TODO list progress"""
+"""Script that provides information on an employee's task completion"""
 
 import json
 import requests
 import sys
 
 if __name__ == "__main__":
-    TASK_TITLES = []
-    NUM_DONE_TASKS = 0
-    TOTAL_TASKS = 0
+    employee_tasks = []
+    completed_tasks = 0
+    total_tasks = 0
 
     employee_id = int(sys.argv[1])
 
@@ -23,13 +23,13 @@ if __name__ == "__main__":
 
     for task in todo_data:
         if task.get('userId') == employee_id:
+            total_tasks += 1
             if task.get('completed'):
-                TASK_TITLES.append(task['title'])
-                NUM_DONE_TASKS += 1
-            TOTAL_TASKS += 1
+                completed_tasks += 1
+                employee_tasks.append(task['title'])
 
     print(f"Employee {employee_name} has completed "
-          f"{NUM_DONE_TASKS} out of {TOTAL_TASKS} tasks:")
+          f"{completed_tasks} out of {total_tasks} tasks:")
 
-    for title in TASK_TITLES:
-        print(f"\t{title}")
+    for title in employee_tasks:
+        print(f"\t- {title}")
